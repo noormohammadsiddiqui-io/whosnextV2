@@ -1,4 +1,14 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# WhosNext
+
+WhosNext is a real-time video chat application that connects you instantly with people from around the world. Built with Next.js, Socket.IO, and WebRTC for seamless peer-to-peer communication.
+
+## Features
+
+- 🎥 **Instant Video Chat**: Connect with random people through high-quality video calls
+- 🔄 **Automatic Reconnection**: Seamlessly connects you to a new person if your current chat partner disconnects
+- 🌐 **Global Reach**: Meet people from different countries and cultures
+- 🔒 **Privacy First**: No registration required, conversations are not recorded or stored
+- ⚡ **Lightning Fast**: WebRTC technology ensures smooth, low-latency connections
 
 ## Getting Started
 
@@ -16,18 +26,19 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Technology Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
+- **Backend**: Socket.IO for real-time communication
+- **Video**: WebRTC for peer-to-peer video streaming
+- **Styling**: Modern gradient design with responsive layout
 
-## Learn More
+## How It Works
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **Connect**: Click "Start Video Chat" to join the platform
+2. **Match**: Our system automatically pairs you with another online user
+3. **Chat**: Enjoy your video conversation with your matched partner
+4. **Reconnect**: If someone disconnects, you're automatically connected to the next available person
 
 ## Deploy on Vercel
 
