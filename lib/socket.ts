@@ -11,17 +11,16 @@ const getSocketUrl = () => {
 };
 
 const socket = io(getSocketUrl(), {
-  path: '/api/socket',
-  transports: ['polling', 'websocket'], // Start with polling for Vercel compatibility
+  transports: ['polling'], // Use only polling for Vercel compatibility
   autoConnect: true,
   forceNew: false,
-  timeout: 30000, // Increased timeout for serverless cold starts
+  timeout: 60000, // Increased timeout for serverless cold starts
   reconnection: true,
-  reconnectionAttempts: 10, // More attempts for serverless environment
+  reconnectionAttempts: 20, // More attempts for serverless environment
   reconnectionDelay: 1000,
   reconnectionDelayMax: 5000,
   // Vercel-optimized options
-  upgrade: true,
+  upgrade: false, // Disable upgrade to websocket
   rememberUpgrade: false,
   closeOnBeforeunload: false,
   forceBase64: false,

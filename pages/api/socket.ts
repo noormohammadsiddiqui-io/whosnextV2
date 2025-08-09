@@ -33,16 +33,22 @@ const SocketHandler = (req: NextApiRequest, res: SocketNextApiResponse) => {
   
   if (res.socket?.server.io) {
     console.log('Socket.IO is already running');
+    res.end();
+    return;
   } else {
     console.log('Socket.IO is initializing');
     const io = new Server(res.socket.server, {
-      path: '/api/socket',
+      path: '/socket.io/',
+      addTrailingSlash: false,
       cors: {
         origin: "*",
-        methods: ["GET", "POST"]
+        methods: ["GET", "POST"],
+        credentials: false
       },
-      transports: ['polling', 'websocket'],
-      allowEIO3: true
+      transports: ['polling'],
+      allowEIO3: true,
+      pingTimeout: 60000,
+      pingInterval: 25000
     });
     res.socket.server.io = io;
 
