@@ -1,15 +1,25 @@
 import { io } from 'socket.io-client';
 
-const socket = io({
+// Get the base URL for Socket.IO connection
+const getSocketUrl = () => {
+  if (typeof window !== 'undefined') {
+    // Client-side: use current origin
+    return window.location.origin;
+  }
+  // Server-side fallback
+  return process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+};
+
+const socket = io(getSocketUrl(), {
   path: '/api/socket',
   transports: ['polling', 'websocket'], // Start with polling for Vercel compatibility
   autoConnect: true,
   forceNew: false,
   timeout: 30000, // Increased timeout for serverless cold starts
   reconnection: true,
-  reconnectionAttempts: 5, // More attempts for serverless environment
-  reconnectionDelay: 2000,
-  reconnectionDelayMax: 10000,
+  reconnectionAttempts: 10, // More attempts for serverless environment
+  reconnectionDelay: 1000,
+  reconnectionDelayMax: 5000,
   // Vercel-optimized options
   upgrade: true,
   rememberUpgrade: false,
