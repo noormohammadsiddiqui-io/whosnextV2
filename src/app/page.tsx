@@ -35,7 +35,7 @@ export default function HomePage() {
         
         <p className="text-xl mb-4 text-gray-700 max-w-2xl mx-auto">
           Connect instantly with people from around the world through random video chats. 
-          No registration required, just click and discover who's next!
+          No registration required, just click and discover who&apos;s next!
         </p>
         
         <div className="mb-8 bg-blue-100 text-blue-800 py-2 px-4 rounded-full inline-flex items-center">

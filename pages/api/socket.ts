@@ -13,7 +13,7 @@ interface SocketNextApiResponse extends NextApiResponse {
 }
 
 let users: string[] = []; // In-memory array to store socket IDs
-let userPairs: Map<string, string> = new Map(); // Track paired users
+const userPairs: Map<string, string> = new Map(); // Track paired users
 let totalConnectedUsers = 0; // Track total number of connected users
 
 const SocketHandler = (req: NextApiRequest, res: SocketNextApiResponse) => {

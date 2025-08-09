@@ -91,7 +91,7 @@ socket.io.engine.on('upgrade', () => {
   console.log('Socket.IO transport upgraded to:', socket.io.engine.transport.name);
 });
 
-socket.io.engine.on('upgradeError', (error: any) => {
+socket.io.engine.on('upgradeError', (error: Error) => {
   console.error('Socket.IO transport upgrade error:', error);
 });
 

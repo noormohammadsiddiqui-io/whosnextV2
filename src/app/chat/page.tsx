@@ -1342,7 +1342,7 @@ export default function VideoChat() {
                 <div className="absolute -inset-2 border-2 border-white/20 rounded-full animate-ping"></div>
               </div>
               <h3 className="text-2xl font-semibold text-white mb-2">Looking for someone...</h3>
-              <p className="text-white/70">We're connecting you with a random person</p>
+              <p className="text-white/70">We&apos;re connecting you with a random person</p>
             </div>
           </div>
         )}
