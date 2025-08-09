@@ -1,9 +1,4 @@
 {
-  "functions": {
-    "pages/api/socket.ts": {
-      "runtime": "@vercel/node"
-    }
-  },
   "rewrites": [
     {
       "source": "/socket.io/(.*)",
