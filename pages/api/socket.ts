@@ -20,35 +20,12 @@ const SocketHandler = (req: NextApiRequest, res: SocketNextApiResponse) => {
   console.log('Socket handler called with method:', req.method);
   console.log('Socket handler headers:', JSON.stringify(req.headers));
   console.log('Socket handler query:', JSON.stringify(req.query));
-  
-  // Set CORS headers for Vercel deployment
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
-  
   if (res.socket?.server.io) {
     console.log('Socket.IO is already running');
-    res.end();
-    return;
   } else {
     console.log('Socket.IO is initializing');
     const io = new Server(res.socket.server, {
-      path: '/socket.io/',
-      addTrailingSlash: false,
-      cors: {
-        origin: "*",
-        methods: ["GET", "POST"],
-        credentials: false
-      },
-      transports: ['polling'],
-      allowEIO3: true,
-      pingTimeout: 60000,
-      pingInterval: 25000
+      path: '/api/socket'
     });
     res.socket.server.io = io;
 

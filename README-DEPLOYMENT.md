@@ -43,7 +43,6 @@ If you're using a database or other services:
 - WebSocket connections may be less stable on serverless
 - Polling transport is more reliable on Vercel
 - Consider using external services for production:
-  - **Pusher** for real-time messaging
   - **Ably** for WebSocket connections
   - **Socket.IO with dedicated server** (Railway, Render, etc.)
 

@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Allow: /chat
+
+Sitemap: https://whosnext.com/sitemap.xml
+
+# Block access to admin or private areas (if any)
+Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/

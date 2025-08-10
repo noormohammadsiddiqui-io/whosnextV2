@@ -282,14 +282,28 @@ export default function VideoChat() {
 
     // Debug socket connection status
     console.log('Socket instance details:', socket);
-    console.log('Initial socket connected status:', socket.connected);
+    console.log('Initial socket connected status:', socket?.connected);
+    
+    // Connect socket if not already connected
+    if (socket && !socket.connected) {
+      console.log('Socket not connected, initiating connection...');
+      socket.connect();
+    }
+
+    // Only set up socket listeners if socket exists
+    if (!socket) {
+      setStatus('Socket not available (SSR mode)');
+      return;
+    }
 
     socket.on('connect', () => {
-      console.log('Connected with ID:', socket.id);
-      console.log('Socket connected status after connect:', socket.connected);
-      console.log('Socket transport:', socket.io.engine.transport.name);
-      console.log('Socket readyState:', socket.io.engine.readyState);
-      setStatus(`Connected (${socket.id?.substring(0, 6) || 'unknown'})`);
+      if (socket) {
+        console.log('Connected with ID:', socket.id);
+        console.log('Socket connected status after connect:', socket.connected);
+        console.log('Socket transport:', socket.io.engine.transport.name);
+        console.log('Socket readyState:', socket.io.engine.readyState);
+        setStatus(`Connected (${socket.id?.substring(0, 6) || 'unknown'})`);
+      }
     });
     
     socket.on('connect_error', (error) => {
@@ -300,7 +314,9 @@ export default function VideoChat() {
     
     socket.on('connect_timeout', () => {
       console.error('Socket connection timeout');
-      console.error('Socket status after timeout:', socket.connected);
+      if (socket) {
+        console.error('Socket status after timeout:', socket.connected);
+      }
       setStatus('Connection timeout');
     });
 
@@ -399,8 +415,10 @@ export default function VideoChat() {
           await pc.setLocalDescription(answer);
           console.log('Local description set successfully for answer');
           
-          socket.emit('signal', { to: from, signal: answer });
-          console.log('Sent answer signal to:', from);
+          if (socket) {
+            socket.emit('signal', { to: from, signal: answer });
+            console.log('Sent answer signal to:', from);
+          }
         } else if (signal.type === 'answer') {
           console.log('Processing answer signal');
           // Only process answer if we have a local offer
@@ -439,17 +457,19 @@ export default function VideoChat() {
     return () => {
       console.log('Cleaning up socket and WebRTC resources');
       
-      // Clean up socket event listeners
-      socket.off('connect');
-      socket.off('connect_error');
-      socket.off('connect_timeout');
-      socket.off('error');
-      socket.off('partner');
-      socket.off('partner_disconnected');
-      socket.off('signal');
-      
-      // Disconnect socket
-      socket.disconnect();
+      // Clean up socket event listeners only if socket exists
+      if (socket) {
+        socket.off('connect');
+        socket.off('connect_error');
+        socket.off('connect_timeout');
+        socket.off('error');
+        socket.off('partner');
+        socket.off('partner_disconnected');
+        socket.off('signal');
+        
+        // Disconnect socket
+        socket.disconnect();
+      }
 
       // Close peer connection if it exists
       if (pcRef.current) {
@@ -681,10 +701,12 @@ export default function VideoChat() {
       pc.onicecandidate = (event) => {
         if (event.candidate) {
           console.log('Sending ICE candidate to remote peer');
-          socket.emit('signal', { 
-            to: remoteId, 
-            signal: { candidate: event.candidate } 
-          });
+          if (socket) {
+            socket.emit('signal', { 
+              to: remoteId, 
+              signal: { candidate: event.candidate } 
+            });
+          }
         }
       };
       
@@ -794,25 +816,29 @@ export default function VideoChat() {
         console.log('Creating and sending offer as caller');
         const offer = await pc.createOffer();
         await pc.setLocalDescription(offer);
-        socket.emit('signal', { to: remoteId, signal: offer });
+        if (socket) {
+          socket.emit('signal', { to: remoteId, signal: offer });
+        }
       }
       
       // Send initial mute states to the partner
       console.log('Sending initial mute states to partner');
-      socket.emit('signal', { 
-        to: remoteId, 
-        signal: { 
-          type: 'audio_state', 
-          muted: isMicMuted 
-        } 
-      });
-      socket.emit('signal', { 
-        to: remoteId, 
-        signal: { 
-          type: 'video_state', 
-          muted: isCameraMuted 
-        } 
-      });
+      if (socket) {
+        socket.emit('signal', { 
+          to: remoteId, 
+          signal: { 
+            type: 'audio_state', 
+            muted: isMicMuted 
+          } 
+        });
+        socket.emit('signal', { 
+          to: remoteId, 
+          signal: { 
+            type: 'video_state', 
+            muted: isCameraMuted 
+          } 
+        });
+      }
       
       return pc;
     } catch (error: unknown) {
@@ -1012,10 +1038,25 @@ export default function VideoChat() {
 
   // Mute/unmute microphone
   const toggleMicrophone = async () => {
-    if (!localStreamRef.current || !pcRef.current) return;
+    console.log('toggleMicrophone called, current isMicMuted state:', isMicMuted);
+    
+    if (!localStreamRef.current || !pcRef.current) {
+      console.warn('Missing localStreamRef or pcRef:', {
+        hasLocalStream: !!localStreamRef.current,
+        hasPeerConnection: !!pcRef.current
+      });
+      return;
+    }
     
     try {
       const audioTracks = localStreamRef.current.getAudioTracks();
+      console.log('Audio tracks found:', audioTracks.length, audioTracks.map(t => ({
+        id: t.id,
+        enabled: t.enabled,
+        readyState: t.readyState,
+        muted: t.muted
+      })));
+      
       if (audioTracks.length === 0) {
         console.warn('No audio tracks found in local stream');
         return;
@@ -1026,6 +1067,8 @@ export default function VideoChat() {
       const audioSender = senders.find(sender => 
         sender.track && sender.track.kind === 'audio'
       );
+      
+      console.log('Audio sender found:', !!audioSender, audioSender?.track?.id);
       
       if (!audioSender) {
         console.warn('No audio sender found in peer connection');
@@ -1038,6 +1081,8 @@ export default function VideoChat() {
           console.warn('Audio sender has no track');
           return;
         }
+        
+        console.log('Muting microphone - creating silent track');
         
         // Create a truly silent audio track
         const ctx = new AudioContext();
@@ -1053,6 +1098,7 @@ export default function VideoChat() {
         constantSource.start();
         
         const silentTrack = destination.stream.getAudioTracks()[0];
+        console.log('Silent track created:', silentTrack.id);
         
         // Replace the track with the silent one
         await audioSender.replaceTrack(silentTrack);
@@ -1060,26 +1106,30 @@ export default function VideoChat() {
         
         // Disable local audio track for local preview
         audioTracks.forEach(track => {
+          console.log(`Disabling audio track ${track.id}`);
           track.enabled = false;
         });
         
         setIsMicMuted(true);
-        console.log('Microphone muted');
+        console.log('Microphone muted - state updated');
       } else {
+        console.log('Unmuting microphone - restoring original track');
+        
         // Restore the original audio track
         if (audioTracks.length > 0) {
           // Enable the original track first
           audioTracks.forEach(track => {
+            console.log(`Enabling audio track ${track.id}`);
             track.enabled = true;
           });
           
           // Replace the silent track with the original
           await audioSender.replaceTrack(audioTracks[0]);
-          console.log('Silent track replaced with original audio track');
+          console.log('Silent track replaced with original audio track:', audioTracks[0].id);
         }
         
         setIsMicMuted(false);
-        console.log('Microphone unmuted');
+        console.log('Microphone unmuted - state updated');
       }
       
       // Notify the partner about the audio state change
@@ -1317,7 +1367,7 @@ export default function VideoChat() {
           style={{ backgroundColor: '#1a1a1a' }}
         />
         {partnerId && partnerVideoMuted && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-900/90">
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
             <div className="text-center p-8">
               <div className="w-20 h-20 mx-auto bg-white/10 rounded-full flex items-center justify-center mb-4">
                 <svg className="w-10 h-10 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1384,7 +1434,7 @@ export default function VideoChat() {
           style={{ backgroundColor: '#1a1a1a' }}
         />
         {(cameraPermission !== 'granted' || isCameraMuted) && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-800/90">
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
             <div className="text-center p-2">
               <svg className="mx-auto h-8 w-8 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />

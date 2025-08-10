@@ -8,8 +8,17 @@ export default function HomePage() {
   const [onlineUsers, setOnlineUsers] = useState(0);
   
   useEffect(() => {
+    // Import socket and connect it
+    import('../../lib/socket').then(({ default: socket }) => {
+      if (socket && !socket.connected) {
+        console.log('Connecting socket from homepage');
+        socket.connect();
+      }
+    });
+
     // Subscribe to online users count updates
     const unsubscribe = subscribeToOnlineUsersCount((count) => {
+      console.log('Homepage received user count update:', count);
       setOnlineUsers(count);
     });
     
@@ -30,12 +39,12 @@ export default function HomePage() {
         </div>
         
         <h1 className="text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
-          WhosNext
+          WhosNext - Best Omegle Alternative
         </h1>
         
         <p className="text-xl mb-4 text-gray-700 max-w-2xl mx-auto">
-          Connect instantly with people from around the world through random video chats. 
-          No registration required, just click and discover who&apos;s next!
+          The #1 Omegle alternative for random video chat. Connect instantly with strangers from around the world. 
+          Completely free, no registration required, and safer than Omegle with better video quality!
         </p>
         
         <div className="mb-8 bg-blue-100 text-blue-800 py-2 px-4 rounded-full inline-flex items-center">
@@ -62,20 +71,59 @@ export default function HomePage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12" id="features">
           <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
             <div className="text-blue-600 text-4xl mb-4">🔒</div>
-            <h3 className="text-xl font-bold mb-2">Private & Secure</h3>
-            <p className="text-gray-600">Your conversations are never recorded or stored. Connect with confidence.</p>
+            <h3 className="text-xl font-bold mb-2">Safer Than Omegle</h3>
+            <p className="text-gray-600">Better moderation and security features. Your conversations are private and never recorded or stored.</p>
           </div>
           
           <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
             <div className="text-blue-600 text-4xl mb-4">🌐</div>
-            <h3 className="text-xl font-bold mb-2">Global Reach</h3>
-            <p className="text-gray-600">Connect with people from different countries and cultures instantly.</p>
+            <h3 className="text-xl font-bold mb-2">Best Omegle Alternative</h3>
+            <p className="text-gray-600">Superior to Omegle with HD video quality, faster connections, and users from 190+ countries.</p>
           </div>
           
           <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
             <div className="text-blue-600 text-4xl mb-4">⚡</div>
-            <h3 className="text-xl font-bold mb-2">Lightning Fast</h3>
-            <p className="text-gray-600">Our WebRTC technology ensures smooth, high-quality video connections.</p>
+            <h3 className="text-xl font-bold mb-2">Free Random Video Chat</h3>
+            <p className="text-gray-600">100% free forever. No hidden fees, no registration required. Start chatting with strangers instantly.</p>
+          </div>
+        </div>
+        
+        {/* SEO Content Section */}
+        <div className="mt-16 max-w-4xl mx-auto text-left bg-white p-8 rounded-xl shadow-md">
+          <h2 className="text-3xl font-bold mb-6 text-gray-800">Why WhosNext is the Best Omegle Alternative</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h3 className="text-xl font-semibold mb-3 text-blue-600">Better Than Omegle</h3>
+              <ul className="space-y-2 text-gray-700">
+                <li>• HD video quality (1080p vs Omegle's 720p)</li>
+                <li>• Faster connection speeds</li>
+                <li>• Better mobile experience</li>
+                <li>• Advanced spam protection</li>
+                <li>• No ads interrupting your chats</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="text-xl font-semibold mb-3 text-blue-600">Safe & Secure</h3>
+              <ul className="space-y-2 text-gray-700">
+                <li>• Enhanced moderation system</li>
+                <li>• Report and block features</li>
+                <li>• No chat logs stored</li>
+                <li>• Anonymous connections</li>
+                <li>• GDPR compliant</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold mb-3 text-blue-600">Free Random Video Chat Features</h3>
+            <p className="text-gray-700 leading-relaxed">
+              WhosNext offers the best free random video chat experience online. Unlike other Omegle alternatives, 
+              we provide crystal-clear HD video, instant connections, and a user-friendly interface that works 
+              perfectly on desktop and mobile devices. Connect with millions of users worldwide for free random 
+              video chats, text conversations, and make new friends from different cultures and countries.
+            </p>
           </div>
         </div>
       </div>
